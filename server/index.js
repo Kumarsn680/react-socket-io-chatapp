@@ -1,11 +1,13 @@
 const express = require("express");
 const socketio = require("socket.io");
 const http = require("http");
-const router = require("./router");
+const router = require("./functions/router");
 const cors = require("cors");
-const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
 
-const app = express();
+const { addUser, removeUser, getUser, getUsersInRoom } = require("./functions/users");
+
+const app = express.Router();
+app.use(cors())
 const server = http.createServer(app);
 const io = socketio(server, {
   cors: {
@@ -13,7 +15,7 @@ const io = socketio(server, {
   },
 });
 const PORT = process.env.PORT || 3000;
-app.use(router);
+
 
 io.on("connection", (socket) => {
   console.log("first connection with server");
@@ -86,3 +88,5 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
 });
+
+
