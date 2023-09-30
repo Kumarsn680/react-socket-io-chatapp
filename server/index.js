@@ -1,13 +1,17 @@
 const express = require("express");
 const socketio = require("socket.io");
 const http = require("http");
-const router = require("./functions/router");
 const cors = require("cors");
 
-const { addUser, removeUser, getUser, getUsersInRoom } = require("./functions/users");
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+} = require("./users");
 
 const app = express.Router();
-app.use(cors())
+app.use(cors());
 const server = http.createServer(app);
 const io = socketio(server, {
   cors: {
@@ -16,7 +20,6 @@ const io = socketio(server, {
 });
 const PORT = process.env.PORT || 3000;
 
-
 io.on("connection", (socket) => {
   console.log("first connection with server");
 
@@ -24,16 +27,16 @@ io.on("connection", (socket) => {
     console.log(name, room);
     const { error, user } = addUser(socket.id, name, room);
 
-    if(error) {
-      return callback(error)
-    }else{
-      callback(error)
+    if (error) {
+      return callback(error);
+    } else {
+      callback(error);
     }
-    console.log('do we visit here')
+    console.log("do we visit here");
     socket.join(user.room);
 
-    socket.on("onchatRoom",()=>{
-      console.log('we are on chatroom')
+    socket.on("onchatRoom", () => {
+      console.log("we are on chatroom");
       socket.emit("message", {
         user: "admin",
         text: `welcome to the room ${user.name}`,
@@ -51,13 +54,11 @@ io.on("connection", (socket) => {
         users: getUsersInRoom(user.room),
       });
     });
-    
   });
 
   socket.on("sendMessage", (message, callback) => {
     const user = getUser(socket.id);
-    console.log('sendmessage me hai ham',user,message)
-
+    console.log("sendmessage me hai ham", user, message);
 
     if (user) {
       io.to(user.room).emit("message", {
@@ -88,5 +89,3 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
 });
-
-
